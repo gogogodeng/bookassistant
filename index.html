@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>最优价格计算</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <style>
     input {
       max-width: 100px;
@@ -90,6 +91,7 @@
         </label>
       </div>
     </div>
+    <button @click="search">search</button>
   </div>
 
 <script>
@@ -198,6 +200,14 @@
       removebook(guid) {
         this.books = this.books.filter(f=>f.guid!=guid)
       },
+      search() {
+        axios({
+          method: 'get',
+          url: 'http://product.m.dangdang.com/29457036.html?unionid=P-131140353m-:-dd_1',
+        }).then(r=>{
+          console.log(r.data)
+        })
+      }
     }
   }).mount('#app')
 
