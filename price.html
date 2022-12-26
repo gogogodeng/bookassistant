@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>一页最新价格清单</title>
+  <title>一页最新价格清单（当当）</title>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
   <style>
@@ -14,11 +14,45 @@
       font-size: 14px;
       outline: none;
     }
+    td {
+      padding: 5px 10px;
+    }
   </style>
 </head>
 <body>
   <div id="app">
     <button @click="search">search</button>
+    <hr>
+    <table border>
+      <tr>
+        <td style="width: 300px;">书名</td>
+        <td style="width: 250px;">链接</td>
+        <td style="width: 100px;">原价</td>
+        <td style="width: 100px;">现价</td>
+        <td style="width: 100px;">折扣率</td>
+      </tr>
+      <tr v-for="item in books">
+        <td>
+          {{ item.title }}
+        </td>
+        <td>
+          <input type="text" v-model="item.url" style="max-width: 250px;width: 250px">
+        </td>
+        <td>
+          {{ item.original_price }}
+        </td>
+        <td>
+          {{ item.price }}
+        </td>
+        <td style="position: relative;">
+          {{ item.pr }}
+          <span @click="removebook(item.guid)" style="position: absolute; right: 0; top: 0;cursor: pointer;color:red">&times;</span>
+        </td>
+      </tr>
+    </table>
+    <br>
+    <button @click="addbook">添加</button>
+    
   </div>
 
 <script>
@@ -28,20 +62,75 @@
     data() {
       return {
         message: '',
+        books: [
+          {
+            guid: guid(),
+            url: 'https://u.dangdang.com/BRa4k',
+            title: '一頁文库·芥川龙之介系列（全8册）',
+            price: '',
+            original_price: '',
+            pr: ''
+          },
+          {
+            guid: guid(),
+            url: 'https://u.dangdang.com/XmZEC',
+            title: '诅咒兔（与诺奖得主托卡尔丘克一同入围2022年国际布克奖！）',
+            price: '',
+            original_price: '',
+            pr: ''
+          },
+          {
+            guid: guid(),
+            url: 'https://u.dangdang.com/nWA4k',
+            title: '翦商',
+            price: '',
+            original_price: '',
+            pr: ''
+          },
+        ]
       }
     },
     computed: {
     },
     methods: {
+      addbook() {
+        this.books.push({
+          guid: guid(),
+          url: '',
+          title: '',
+          price: '',
+          original_price: '',
+          pr: ''
+        })
+      },
+      removebook(guid) {
+        this.books = this.books.filter(f=>f.guid!=guid)
+      },
       search() {
-        axios({
-          method: 'get',
-          url: 'http://product.m.dangdang.com/29457036.html?unionid=P-131140353m-:-dd_1',
-        }).then(r=>{
-          console.log(r.data)
+        let num = 0
+        this.books.forEach(item=>{
+          setTimeout(async ()=>{
+            let res = await axios({
+              method: 'get',
+              url: 'http://localhost:3001/scrap/dangdang',
+              params: {
+                url: item.url
+              }
+            })
+            item = Object.assign(item,res.data)  
+            num++
+            if(num === this.books.length) {
+              localStorage.setItem('books',JSON.stringify(this.books))
+            }
+          },500)
         })
       }
-    }
+    },
+    mounted() {
+      if(localStorage.getItem('books')) {
+        this.books = JSON.parse(localStorage.getItem('books'))
+      }
+    },
   }).mount('#app')
 
   //生成随机 GUID 数
