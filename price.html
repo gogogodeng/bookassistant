@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>一页最新价格清单</title>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <style>
+    input {
+      max-width: 100px;
+      height: 20px;
+      font-size: 14px;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <button @click="search">search</button>
+  </div>
+
+<script>
+  const { createApp } = Vue
+  
+  createApp({
+    data() {
+      return {
+        message: '',
+      }
+    },
+    computed: {
+    },
+    methods: {
+      search() {
+        axios({
+          method: 'get',
+          url: 'http://product.m.dangdang.com/29457036.html?unionid=P-131140353m-:-dd_1',
+        }).then(r=>{
+          console.log(r.data)
+        })
+      }
+    }
+  }).mount('#app')
+
+  //生成随机 GUID 数
+  function guid() {
+    function S4() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    }
+    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+  }
+</script>
+</body>
+</html>
