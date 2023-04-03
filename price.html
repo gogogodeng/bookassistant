@@ -24,7 +24,8 @@
 
 <body>
   <div id="app">
-    <button @click="search">search</button>
+    <button @click="search">暂存</button>
+    <button @click="clear">清空</button>
     <hr>
     <table border>
       <tr>
@@ -177,24 +178,29 @@
         removebook(guid) {
           this.books = this.books.filter(f => f.guid != guid)
         },
+        clear() {
+          this.books = []
+        },
         search() {
-          let num = 0
-          this.books.forEach(item => {
-            setTimeout(async () => {
-              let res = await axios({
-                method: 'get',
-                url: 'http://localhost:3001/scrap/dangdang',
-                params: {
-                  url: item.url
-                }
-              })
-              item = Object.assign(item, res.data)
-              num++
-              if (num === this.books.length) {
-                localStorage.setItem('books', JSON.stringify(this.books))
-              }
-            }, 500)
-          })
+          // let num = 0
+          // this.books.forEach(item => {
+          //   setTimeout(async () => {
+          //     let res = await axios({
+          //       method: 'get',
+          //       url: 'http://localhost:3001/scrap/dangdang',
+          //       params: {
+          //         url: item.url
+          //       }
+          //     })
+          //     item = Object.assign(item, res.data)
+          //     num++
+          //     if (num === this.books.length) {
+          //       localStorage.setItem('books', JSON.stringify(this.books))
+          //     }
+          //   }, 500)
+          // })
+          // 暂存localstorage
+          localStorage.setItem('books', JSON.stringify(this.books))
         },
         getCombo() {
           let res = this.findCombinations(this.books.map(m => {
