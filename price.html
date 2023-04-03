@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -14,11 +15,13 @@
       font-size: 14px;
       outline: none;
     }
+
     td {
       padding: 5px 10px;
     }
   </style>
 </head>
+
 <body>
   <div id="app">
     <button @click="search">search</button>
@@ -27,167 +30,217 @@
       <tr>
         <td style="width: 300px;">书名</td>
         <td style="width: 250px;">链接</td>
-        <td style="width: 100px;">原价</td>
         <td style="width: 100px;">现价</td>
+        <td style="width: 100px;">原价</td>
         <td style="width: 100px;">折扣率</td>
       </tr>
       <tr v-for="item in books">
         <td>
-          {{ item.title }}
+          <input type="text" v-model="item.title" style="max-width: 100%;width: 100%">
         </td>
         <td>
           <input type="text" v-model="item.url" style="max-width: 250px;width: 250px">
         </td>
         <td>
-          {{ item.original_price }}
+          <input type="number" v-model="item.price" style="max-width: 50px;width: 50px">
         </td>
         <td>
-          {{ item.price }}
+          {{ item.original_price }}
         </td>
         <td style="position: relative;">
           {{ item.pr }}
-          <span @click="removebook(item.guid)" style="position: absolute; right: 0; top: 0;cursor: pointer;color:red">&times;</span>
+          <span @click="removebook(item.guid)"
+            style="position: absolute; right: 0; top: 0;cursor: pointer;color:red">&times;</span>
         </td>
       </tr>
     </table>
     <br>
     <button @click="addbook">添加</button>
-    
+    <br>
+    凑单金额<input type="text" value="300">
+    <button @click="getCombo">计算凑单组合</button>
+    <div>
+      <ul v-for="(item,i) in combo">
+        <li>组合{{i+1}}：</li>
+        <li v-for="c in item.name.split('#')">【{{c}}】</li>
+        <li>价格：{{item.money}}</li>
+      </ul>
+    </div>
   </div>
 
-<script>
-  const { createApp } = Vue
-  
-  createApp({
-    data() {
-      return {
-        message: '',
-        books: [
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/m5xfH',
-            title: '关于女儿',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/XmZEC',
-            title: '诅咒兔（与诺奖得主托卡尔丘克一同入围2022年国际布克奖！）',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/nWA4k',
-            title: '翦商',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/tlgFJ',
-            title: '温柔的确定性',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/8VGpw',
-            title: '与瓦尔泽一起散步',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/VRxfH',
-            title: '梦旅店',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/81m8d',
-            title: '大宋之法',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/BRa4k',
-            title: '一頁文库·芥川龙之介系列（全8册）',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-          {
-            guid: guid(),
-            url: 'https://u.dangdang.com/qDztD',
-            title: '三岛由纪夫',
-            price: '',
-            original_price: '',
-            pr: ''
-          },
-        ]
-      }
-    },
-    computed: {
-    },
-    methods: {
-      addbook() {
-        this.books.push({
-          guid: guid(),
-          url: '',
-          title: '',
-          price: '',
-          original_price: '',
-          pr: ''
-        })
-      },
-      removebook(guid) {
-        this.books = this.books.filter(f=>f.guid!=guid)
-      },
-      search() {
-        let num = 0
-        this.books.forEach(item=>{
-          setTimeout(async ()=>{
-            let res = await axios({
-              method: 'get',
-              url: 'http://localhost:3001/scrap/dangdang',
-              params: {
-                url: item.url
-              }
-            })
-            item = Object.assign(item,res.data)  
-            num++
-            if(num === this.books.length) {
-              localStorage.setItem('books',JSON.stringify(this.books))
-            }
-          },500)
-        })
-      }
-    },
-    mounted() {
-      if(localStorage.getItem('books')) {
-        this.books = JSON.parse(localStorage.getItem('books'))
-      }
-    },
-  }).mount('#app')
+  <script>
+    const { createApp } = Vue
 
-  //生成随机 GUID 数
-  function guid() {
-    function S4() {
+    createApp({
+      data() {
+        return {
+          message: '',
+          books: [
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/m5xfH',
+              pid: '',
+              title: '关于女儿',
+              price: '30',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/XmZEC',
+              pid: '',
+              title: '诅咒兔（与诺奖得主托卡尔丘克一同入围2022年国际布克奖！）',
+              price: '60',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/nWA4k',
+              pid: '',
+              title: '翦商',
+              price: '60',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/tlgFJ',
+              pid: '',
+              title: '温柔的确定性',
+              price: '50',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/8VGpw',
+              pid: '',
+              title: '与瓦尔泽一起散步',
+              price: '70',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/VRxfH',
+              pid: '',
+              title: '梦旅店',
+              price: '80',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/81m8d',
+              pid: '',
+              title: '大宋之法',
+              price: '30',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/BRa4k',
+              pid: '',
+              title: '一頁文库·芥川龙之介系列（全8册）',
+              price: '100',
+              original_price: '',
+              pr: ''
+            },
+            {
+              guid: guid(),
+              url: 'https://u.dangdang.com/qDztD',
+              pid: '',
+              title: '三岛由纪夫',
+              price: '200',
+              original_price: '',
+              pr: ''
+            },
+          ],
+          combo: []
+        }
+      },
+      computed: {
+      },
+      methods: {
+        addbook() {
+          this.books.push({
+            guid: guid(),
+            url: '',
+            title: '',
+            price: '',
+            original_price: '',
+            pr: ''
+          })
+        },
+        removebook(guid) {
+          this.books = this.books.filter(f => f.guid != guid)
+        },
+        search() {
+          let num = 0
+          this.books.forEach(item => {
+            setTimeout(async () => {
+              let res = await axios({
+                method: 'get',
+                url: 'http://localhost:3001/scrap/dangdang',
+                params: {
+                  url: item.url
+                }
+              })
+              item = Object.assign(item, res.data)
+              num++
+              if (num === this.books.length) {
+                localStorage.setItem('books', JSON.stringify(this.books))
+              }
+            }, 500)
+          })
+        },
+        getCombo() {
+          let res = this.findCombinations(this.books.map(m => {
+            m.money = +m.price
+            m.name = m.title
+            return m
+          }), 300)
+          console.log(res)
+          this.combo = res
+        },
+        findCombinations(arr, target, num = 7) {
+          let result = []; let temp = [];
+          const dfs = (start, sum) => {
+            if (sum > target + 50 || temp.length > num) return;
+            if (sum > target && sum <= target + 50) {
+              result.push({ guid: [...temp], name: temp.map(g => arr.find(o => o.guid === g).name).join('#'), money: sum });
+              return;
+            }
+            for (let i = start; i < arr.length; i++) {
+              if (temp.includes(arr[i].guid)) continue; temp.push(arr[i].guid);
+              dfs(i + 1, sum + arr[i].money); 
+              temp.pop();
+            }
+          }; dfs(0, 0);
+          result.sort((a, b) => {
+            const diffA = Math.abs(a.money - target); const diffB = Math.abs(b.money - target);
+            return diffA - diffB;
+          });
+          return result.slice(0, num);
+        }
+      },
+      mounted() {
+        if (localStorage.getItem('books')) {
+          this.books = JSON.parse(localStorage.getItem('books'))
+        }
+      },
+    }).mount('#app')
+
+    //生成随机 GUID 数
+    function guid() {
+      function S4() {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+      }
+      return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
     }
-    return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
-  }
-</script>
+  </script>
 </body>
+
 </html>
