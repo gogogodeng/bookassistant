@@ -10,7 +10,7 @@
         <!-- <td style="width: 250px">链接</td> -->
         <td style="width: 100px">现价</td>
         <td style="width: 100px">原价</td>
-        <td style="width: 100px">操作</td>
+        <td style="width: 100px">锁定</td>
         <!-- <td style="width: 100px">折扣率</td> -->
       </tr>
       <tr v-for="(item, index) in books" :key="item.guid">
@@ -43,12 +43,13 @@
           />
         </td>
         <td>
-          <button @click="swapArrayElements(books, index, index - 1)">
+          <input type="checkbox" v-model="item.lock">
+          <!-- <button @click="swapArrayElements(books, index, index - 1)">
             上移
           </button>
           <button @click="swapArrayElements(books, index, index + 1)">
             下移
-          </button>
+          </button> -->
         </td>
         <td style="position: relative">
           <!-- {{ item.pr }}% -->
@@ -109,7 +110,7 @@
     <input type="number" v-model="curNum" /> 个结果
     <button @click="getCombo">计算凑单组合</button>
     <br />
-    <strong>备注：目前算法按排列顺序设置优先级，尽量把最想要的书放前面</strong>
+    <strong>备注：算法默认按排列顺序计算优先级，可以锁定想要的书</strong>
     <hr />
     <div>
       <ul v-for="(item, i) in combo" :key="i">
@@ -124,6 +125,7 @@
 </template>
 
 <script>
+
 //生成随机 GUID 数
 function guid() {
   function S4() {
@@ -258,7 +260,7 @@ export default {
     },
     removebook(guid) {
       var isok = confirm("你确定要删除吗？");
-      if(isok) {
+      if (isok) {
         this.books = this.books.filter((f) => f.guid != guid);
       }
     },
@@ -325,12 +327,20 @@ export default {
     filterObjectsById(objArray, idArray) {
       return objArray.filter((obj) => idArray.includes(obj.guid));
     },
+    findObjectsByIds(targetArray, idArray) {
+      return targetArray.filter(function (item) {
+        var containsAllIds = idArray.every(function (id) {
+          return item.guid.indexOf(id) !== -1;
+        });
+        return containsAllIds;
+      });
+    },
     findCombinations(arr, target, num = 5) {
       let result = [];
       let temp = [];
       const dfs = (start, sum) => {
-        if (sum > target + 50 || temp.length > num) return;
-        if (sum > target && sum <= target + 50) {
+        if (sum > target + 10 || temp.length > num) return;
+        if (sum > target && sum <= target + 10) {
           result.push({
             guid: [...temp],
             money: sum,
@@ -350,6 +360,10 @@ export default {
         const diffB = Math.abs(b.money - target);
         return diffA - diffB;
       });
+
+      result = this.findObjectsByIds(result, this.books.filter(f=>!!f.lock).map(m=>{
+        return m.guid
+      }))
       return result.splice(0, num);
     },
     findCombinations2(arr, target, num = 5) {
@@ -416,7 +430,7 @@ export default {
       this.books.map((m) => {
         let x = (this.maxValue.total / this.maxValue.max) * m.price;
         m.total = x.toFixed(2);
-        m.pr = (m.total / m.original_price).toFixed(2) * 100;
+        m.pr = ((x / m.original_price) * 100).toFixed(2);
       });
     },
   },
