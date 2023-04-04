@@ -6,13 +6,14 @@
     <hr />
     <table>
       <tr>
-        <td style="width: 300px">书名</td>
+        <td style="width: 200px">书名</td>
         <!-- <td style="width: 250px">链接</td> -->
         <td style="width: 100px">现价</td>
         <td style="width: 100px">原价</td>
+        <td style="width: 100px">操作</td>
         <!-- <td style="width: 100px">折扣率</td> -->
       </tr>
-      <tr v-for="item in books" :key="item.guid">
+      <tr v-for="(item, index) in books" :key="item.guid">
         <td>
           <input
             type="text"
@@ -41,6 +42,14 @@
             style="max-width: 70%; width: 70%"
           />
         </td>
+        <td>
+          <button @click="swapArrayElements(books, index, index - 1)">
+            上移
+          </button>
+          <button @click="swapArrayElements(books, index, index + 1)">
+            下移
+          </button>
+        </td>
         <td style="position: relative">
           <!-- {{ item.pr }}% -->
           <span
@@ -48,7 +57,7 @@
             style="
               position: absolute;
               right: 0;
-              top: 0;
+              top: 5px;
               cursor: pointer;
               color: red;
             "
@@ -248,10 +257,26 @@ export default {
       });
     },
     removebook(guid) {
-      this.books = this.books.filter((f) => f.guid != guid);
+      var isok = confirm("你确定要删除吗？");
+      if(isok) {
+        this.books = this.books.filter((f) => f.guid != guid);
+      }
     },
     clear() {
       this.books = [];
+    },
+    swapArrayElements(array, index1, index2) {
+      if (
+        index1 < 0 ||
+        index1 >= array.length ||
+        index2 < 0 ||
+        index2 >= array.length
+      ) {
+        return;
+      }
+      const temp = array[index1];
+      array[index1] = array[index2];
+      array[index2] = temp;
     },
     search() {
       // let num = 0
@@ -391,7 +416,7 @@ export default {
       this.books.map((m) => {
         let x = (this.maxValue.total / this.maxValue.max) * m.price;
         m.total = x.toFixed(2);
-        m.pr = (x / m.original_price).toFixed(2) * 100;
+        m.pr = (m.total / m.original_price).toFixed(2) * 100;
       });
     },
   },
