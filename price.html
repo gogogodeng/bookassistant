@@ -25,12 +25,13 @@
 <body>
   <div id="app">
     <button @click="search">暂存</button>
+    &nbsp;&nbsp;&nbsp;
     <button @click="clear">清空</button>
     <hr>
     <table border>
       <tr>
         <td style="width: 300px;">书名</td>
-        <td style="width: 250px;">链接</td>
+        <!-- <td style="width: 250px;">链接</td> -->
         <td style="width: 100px;">现价</td>
         <td style="width: 100px;">原价</td>
         <td style="width: 100px;">折扣率</td>
@@ -39,9 +40,9 @@
         <td>
           <input type="text" v-model="item.title" style="max-width: 100%;width: 100%">
         </td>
-        <td>
+        <!-- <td>
           <input type="text" v-model="item.url" style="max-width: 250px;width: 250px">
-        </td>
+        </td> -->
         <td>
           <input type="number" v-model="item.price" style="max-width: 50px;width: 50px">
         </td>
