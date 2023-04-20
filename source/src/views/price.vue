@@ -110,7 +110,7 @@
     <input type="number" v-model="curNum" /> 个结果
     <button @click="getCombo">计算凑单组合</button>
     <br />
-    <strong>备注：算法默认按排列顺序计算优先级，可以锁定想要的书</strong>
+    <strong>备注：算法默认按排列顺序计算优先级，点击锁定, 就会优先显示锁定书的组合</strong>
     <hr />
     <div>
       <ul v-for="(item, i) in combo" :key="i">
@@ -196,13 +196,19 @@ export default {
         {
           guid: guid(),
           max: 300,
-          dis: 50,
+          dis: 100,
+          checked: false,
+        },
+        {
+          guid: guid(),
+          max: 300,
+          dis: 80,
           checked: false,
         },
         {
           guid: guid(),
           max: 200,
-          dis: 30,
+          dis: 50,
           checked: false,
         },
       ],
@@ -219,14 +225,14 @@ export default {
   computed: {
     booksTotal() {
       return this.books.length
-        ? this.books.reduce((p, c) => p + c.price, 0)
+        ? this.books.reduce((p, c) => p + +c.price, 0)
         : 0;
     },
     maxValue() {
       let list = this.options.filter((f) => f.checked === true);
       let max, sum, evrsum;
       if (list.length) {
-        max = this.booksTotal;
+        max = this.curMoney;
 
         sum = list.reduce((p, c) => {
           if (max < c.max) {
@@ -235,7 +241,7 @@ export default {
           return p + c.dis;
         }, 0);
       } else {
-        max = this.booksTotal;
+        max = this.curMoney;
         sum = 0;
       }
       evrsum = this.evr ? Math.floor(max / this.evrV.max) * this.evrV.dis : 0;
@@ -430,6 +436,7 @@ export default {
     },
     calcAll() {
       this.books.map((m) => {
+        console.log(this.maxValue)
         let x = (this.maxValue.total / this.maxValue.max) * m.price;
         m.total = x.toFixed(2);
         m.pr = ((x / m.original_price) * 100).toFixed(2);
