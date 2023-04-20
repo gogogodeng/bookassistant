@@ -159,7 +159,7 @@ export default {
           price: 200,
           original_price: 300,
           pr: "",
-          total: undefined,
+          total: 0,
         },
         {
           guid: guid(),
@@ -169,7 +169,7 @@ export default {
           price: 30,
           original_price: 49,
           pr: "",
-          total: undefined,
+          total: 0,
         },
         {
           guid: guid(),
@@ -179,7 +179,7 @@ export default {
           price: 30,
           original_price: 60,
           pr: "",
-          total: undefined,
+          total: 0,
         },
         {
           guid: guid(),
@@ -189,7 +189,7 @@ export default {
           price: 49,
           original_price: 99,
           pr: "",
-          total: undefined,
+          total: 0,
         },
       ],
       options: [
@@ -256,6 +256,8 @@ export default {
         price: "",
         original_price: "",
         pr: "",
+        total: 0,
+        lock: false
       });
     },
     removebook(guid) {
@@ -339,7 +341,7 @@ export default {
       let result = [];
       let temp = [];
       const dfs = (start, sum) => {
-        if (sum > target + 10 || temp.length > num) return;
+        if (sum > target + 10) return;
         if (sum > target && sum <= target + 10) {
           result.push({
             guid: [...temp],
